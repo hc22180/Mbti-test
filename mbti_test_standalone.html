@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI职业性格测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 { font-size: 32px; margin-bottom: 10px; }
+        .header p { font-size: 16px; opacity: 0.9; }
+        .content { padding: 40px 30px; }
+        .intro { text-align: center; margin-bottom: 30px; }
+        .intro h2 { color: #333; margin-bottom: 20px; }
+        .intro p { color: #666; line-height: 1.8; margin-bottom: 15px; }
+        .types-intro {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .types-intro h3 { color: #667eea; margin-bottom: 15px; }
+        .type-item { margin-bottom: 10px; color: #555; line-height: 1.6; }
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin-top: 20px;
+        }
+        .start-btn:hover { transform: scale(1.05); }
+        .test-section { display: none; }
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            transition: width 0.3s;
+        }
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+        .question-card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .question-text {
+            color: #333;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            background: white;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .option input[type="radio"] { margin-right: 10px; }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        .btn-prev { background: #e0e0e0; color: #333; }
+        .btn-prev:hover { background: #d0d0d0; }
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-next:hover { transform: scale(1.05); }
+        .btn-next:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result-section { display: none; }
+        .result-header { text-align: center; margin-bottom: 40px; }
+        .result-header h2 { color: #333; margin-bottom: 10px; }
+        .type-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .type-code {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .type-name {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .dimension-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .dimension-card h3 { color: #667eea; margin-bottom: 15px; }
+        .dimension-item {
+            margin-bottom: 15px;
+        }
+        .dimension-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+        .progress-bar-small {
+            background: #e0e0e0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill-small {
+            background: #667eea;
+            height: 100%;
+        }
+        .restart-btn {
+            display: block;
+            margin: 30px auto 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .restart-btn:hover { transform: scale(1.05); }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 24px; }
+            .content { padding: 30px 20px; }
+            .question-text { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 MBTI职业性格测试</h1>
+            <p>Myers-Briggs Type Indicator</p>
+        </div>
+
+        <div class="content" id="introSection">
+            <div class="intro">
+                <h2>欢迎参加MBTI职业性格测试</h2>
+                <p>MBTI是世界上应用最广泛的性格测试工具之一，通过四个维度识别16种性格类型。</p>
+                
+                <div class="types-intro">
+                    <h3>四大维度</h3>
+                    <div class="type-item"><strong>外向(E) vs 内向(I)：</strong>能量来源和关注方向</div>
+                    <div class="type-item"><strong>感觉(S) vs 直觉(N)：</strong>信息收集方式</div>
+                    <div class="type-item"><strong>思考(T) vs 情感(F)：</strong>决策方式</div>
+                    <div class="type-item"><strong>判断(J) vs 知觉(P)：</strong>生活方式</div>
+                </div>
+
+                <p><strong>测试说明：</strong>本测试共93题，请根据你平时的真实表现作答。</p>
+                <p style="color: #667eea;"><strong>温馨提示：</strong>请在安静的环境中完成测试，预计需要15分钟。</p>
+
+                <button class="start-btn" onclick="startTest()">开始测试</button>
+            </div>
+        </div>
+
+        <div class="content test-section" id="testSection">
+            <div class="progress-info">
+                <span id="progressText">进度: 0/93</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn btn-prev" onclick="prevQuestion()" id="prevBtn">上一题</button>
+                <button class="btn btn-next" onclick="nextQuestion()" id="nextBtn" disabled>下一题</button>
+            </div>
+        </div>
+
+        <div class="content result-section" id="resultSection">
+            <div class="result-header">
+                <h2>🎉 测试结果</h2>
+                <p>您的性格类型分析</p>
+            </div>
+
+            <div id="resultContent"></div>
+
+            <button class="restart-btn" onclick="restartTest()">重新测试</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {text:"在社交场合中，我通常是主动与他人交谈的那个人",type:"E",reverse:false},
+            {text:"我更喜欢独自思考问题，而不是与他人讨论",type:"E",reverse:true},
+            {text:"参加聚会或社交活动让我感到精力充沛",type:"E",reverse:false},
+            {text:"长时间独处让我感到放松和舒适",type:"E",reverse:true},
+            {text:"我倾向于有广泛的人际关系网络",type:"E",reverse:false},
+            {text:"我更喜欢与少数几个亲密朋友深入交往",type:"E",reverse:true},
+            {text:"我喜欢在团队中工作和协作",type:"E",reverse:false},
+            {text:"我在独自工作时效率更高",type:"E",reverse:true},
+            {text:"我通常是话多的人，喜欢表达自己的想法",type:"E",reverse:false},
+            {text:"我更倾向于先思考再说话",type:"E",reverse:true},
+            {text:"我容易与陌生人开始对话",type:"E",reverse:false},
+            {text:"在陌生人面前我会感到拘谨",type:"E",reverse:true},
+            {text:"我喜欢成为注意力的中心",type:"E",reverse:false},
+            {text:"我更喜欢保持低调，不引人注目",type:"E",reverse:true},
+            {text:"我通过与他人交流来理清自己的想法",type:"E",reverse:false},
+            {text:"我需要独处的时间来整理思绪",type:"E",reverse:true},
+            {text:"我喜欢参加各种社交活动和聚会",type:"E",reverse:false},
+            {text:"我更喜欢宅在家里而不是外出社交",type:"E",reverse:true},
+            {text:"我的朋友会说我是个外向的人",type:"E",reverse:false},
+            {text:"我的朋友会说我是个内向的人",type:"E",reverse:true},
+            {text:"我在人群中感到自在和舒适",type:"E",reverse:false},
+            {text:"我在人群中容易感到疲惫",type:"E",reverse:true},
+            {text:"我喜欢即兴的、非计划的社交活动",type:"E",reverse:false},
+            {text:"我更关注具体的事实和细节",type:"S",reverse:false},
+            {text:"我更关注整体的概念和可能性",type:"S",reverse:true},
+            {text:"我喜欢实际的、可操作的方案",type:"S",reverse:false},
+            {text:"我喜欢理论性的、创新性的想法",type:"S",reverse:true},
+            {text:"我倾向于相信自己的经验和感觉",type:"S",reverse:false},
+            {text:"我倾向于相信自己的直觉和灵感",type:"S",reverse:true},
+            {text:"我喜欢循序渐进、按部就班地做事",type:"S",reverse:false},
+            {text:"我喜欢跳跃性思维和创新突破",type:"S",reverse:true},
+            {text:"我更注重当下和现实",type:"S",reverse:false},
+            {text:"我更注重未来和可能性",type:"S",reverse:true},
+            {text:"我喜欢处理具体的、实际的问题",type:"S",reverse:false},
+            {text:"我喜欢探索抽象的、理论的概念",type:"S",reverse:true},
+            {text:"我倾向于关注已知的、确定的信息",type:"S",reverse:false},
+            {text:"我倾向于关注未知的、潜在的可能",type:"S",reverse:true},
+            {text:"我做决定时依靠实际经验",type:"S",reverse:false},
+            {text:"我做决定时依靠直觉感受",type:"S",reverse:true},
+            {text:"我更喜欢使用已经验证过的方法",type:"S",reverse:false},
+            {text:"我更喜欢尝试新的、未经验证的方法",type:"S",reverse:true},
+            {text:"我注重细节和准确性",type:"S",reverse:false},
+            {text:"我注重大局和创新性",type:"S",reverse:true},
+            {text:"我喜欢专注于眼前的任务",type:"S",reverse:false},
+            {text:"我的思维经常跳跃到未来",type:"S",reverse:true},
+            {text:"我更相信实际结果",type:"S",reverse:false},
+            {text:"我更相信理论推导",type:"S",reverse:true},
+            {text:"我做决定时更依赖逻辑分析",type:"T",reverse:false},
+            {text:"我做决定时更依赖个人感受和价值观",type:"T",reverse:true},
+            {text:"我认为公平和公正比和谐更重要",type:"T",reverse:false},
+            {text:"我认为和谐和关系比原则更重要",type:"T",reverse:true},
+            {text:"在争论中我倾向于坚持自己的观点",type:"T",reverse:false},
+            {text:"在争论中我倾向于考虑他人的感受",type:"T",reverse:true},
+            {text:"我更注重客观事实而非主观情感",type:"T",reverse:false},
+            {text:"我更注重人的感受而非客观事实",type:"T",reverse:true},
+            {text:"我认为直接批评比委婉暗示更有效",type:"T",reverse:false},
+            {text:"我认为委婉表达比直接批评更好",type:"T",reverse:true},
+            {text:"我能够客观地分析问题而不受情绪影响",type:"T",reverse:false},
+            {text:"我的决策容易受到情绪的影响",type:"T",reverse:true},
+            {text:"我更看重工作的效率和结果",type:"T",reverse:false},
+            {text:"我更看重团队的氛围和关系",type:"T",reverse:true},
+            {text:"我倾向于用理性的方式解决冲突",type:"T",reverse:false},
+            {text:"我倾向于用情感的方式化解矛盾",type:"T",reverse:true},
+            {text:"我认为真相比照顾他人感受更重要",type:"T",reverse:false},
+            {text:"我认为照顾他人感受比坚持真相更重要",type:"T",reverse:true},
+            {text:"我喜欢辩论和探讨不同观点",type:"T",reverse:false},
+            {text:"我避免可能伤害他人感情的争论",type:"T",reverse:true},
+            {text:"我更关注事情本身而非涉及的人",type:"T",reverse:false},
+            {text:"我更关注涉及的人而非事情本身",type:"T",reverse:true},
+            {text:"我认为原则和标准不应因人而异",type:"T",reverse:false},
+            {text:"我喜欢事先制定详细的计划",type:"J",reverse:false},
+            {text:"我喜欢保持灵活，随机应变",type:"J",reverse:true},
+            {text:"我倾向于尽早完成任务",type:"J",reverse:false},
+            {text:"我倾向于在截止日期前完成任务",type:"J",reverse:true},
+            {text:"我喜欢有组织、有条理的环境",type:"J",reverse:false},
+            {text:"我适应混乱、多变的环境",type:"J",reverse:true},
+            {text:"我更喜欢有明确的规则和标准",type:"J",reverse:false},
+            {text:"我更喜欢开放和灵活的方式",type:"J",reverse:true},
+            {text:"我倾向于按计划行事",type:"J",reverse:false},
+            {text:"我倾向于即兴发挥",type:"J",reverse:true},
+            {text:"我喜欢把事情安排得井井有条",type:"J",reverse:false},
+            {text:"我喜欢保持多种选择和可能性",type:"J",reverse:true},
+            {text:"我做事有明确的目标和步骤",type:"J",reverse:false},
+            {text:"我做事边走边看，灵活调整",type:"J",reverse:true},
+            {text:"完成任务后我感到满足和放松",type:"J",reverse:false},
+            {text:"开始新任务让我兴奋",type:"J",reverse:true},
+            {text:"我的工作空间通常很整洁",type:"J",reverse:false},
+            {text:"我的工作空间可能比较凌乱",type:"J",reverse:true},
+            {text:"我喜欢做决定并坚持执行",type:"J",reverse:false},
+            {text:"我喜欢保持选择的开放性",type:"J",reverse:true},
+            {text:"未完成的任务让我感到焦虑",type:"J",reverse:false},
+            {text:"我能同时处理多个未完成的任务",type:"J",reverse:true},
+            {text:"我倾向于遵守时间表和截止日期",type:"J",reverse:false}
+        ];
+
+        let currentQuestion = 0;
+        let answers = new Array(93).fill(null);
+
+        function startTest() {
+            document.getElementById('introSection').style.display = 'none';
+            document.getElementById('testSection').style.display = 'block';
+            showQuestion(0);
+        }
+
+        function showQuestion(index) {
+            currentQuestion = index;
+            const question = questions[index];
+            
+            document.getElementById('questionNumber').textContent = `第 ${index + 1} / 93 题`;
+            document.getElementById('questionText').textContent = question.text;
+            
+            const progress = ((index + 1) / 93) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `进度: ${index + 1}/93`;
+            document.getElementById('progressPercent').textContent = progress.toFixed(1) + '%';
+            
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+            
+            const options = [
+                {text:'非常符合',value:5},
+                {text:'比较符合',value:4},
+                {text:'不确定',value:3},
+                {text:'不太符合',value:2},
+                {text:'完全不符合',value:1}
+            ];
+            
+            options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                if (answers[index] === option.value) {
+                    optionDiv.classList.add('selected');
+                }
+                optionDiv.innerHTML = `<input type="radio" name="q${index}" value="${option.value}"><span>${option.text}</span>`;
+                optionDiv.onclick = () => selectOption(index, option.value);
+                optionsContainer.appendChild(optionDiv);
+            });
+            
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = answers[index] === null;
+            document.getElementById('nextBtn').textContent = index === 92 ? '查看结果' : '下一题';
+        }
+
+        function selectOption(questionIndex, value) {
+            answers[questionIndex] = value;
+            document.getElementById('nextBtn').disabled = false;
+            const options = document.querySelectorAll('#optionsContainer .option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.currentTarget.classList.add('selected');
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) showQuestion(currentQuestion - 1);
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < 92) {
+                showQuestion(currentQuestion + 1);
+            } else {
+                calculateResults();
+            }
+        }
+
+        function calculateResults() {
+            const scores = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+            
+            questions.forEach((q, i) => {
+                const answer = answers[i];
+                if (q.reverse) {
+                    scores[q.type === 'E' ? 'I' : q.type === 'S' ? 'N' : q.type === 'T' ? 'F' : 'P'] += answer;
+                } else {
+                    scores[q.type] += answer;
+                }
+            });
+            
+            const type = 
+                (scores.E > scores.I ? 'E' : 'I') +
+                (scores.S > scores.N ? 'S' : 'N') +
+                (scores.T > scores.F ? 'T' : 'F') +
+                (scores.J > scores.P ? 'J' : 'P');
+            
+            document.getElementById('testSection').style.display = 'none';
+            document.getElementById('resultSection').style.display = 'block';
+            
+            displayResults(type, scores);
+        }
+
+        function displayResults(type, scores) {
+            const typeDescriptions = {
+                'INTJ':'建筑师 - 富有想象力和战略性的思考者',
+                'INTP':'逻辑学家 - 具有创造力的发明家',
+                'ENTJ':'指挥官 - 大胆、富有想象力的强力领导者',
+                'ENTP':'辩论家 - 聪明好奇的思想家',
+                'INFJ':'提倡者 - 安静而神秘的理想主义者',
+                'INFP':'调停者 - 富有诗意、善良的利他主义者',
+                'ENFJ':'主人公 - 有魅力鼓舞人心的领导者',
+                'ENFP':'竞选者 - 热情洋溢、富有创造力的自由精神',
+                'ISTJ':'物流师 - 实际和注重事实的可靠者',
+                'ISFJ':'守卫者 - 非常专注而温暖的保护者',
+                'ESTJ':'总经理 - 出色的管理者',
+                'ESFJ':'执政官 - 非常关心他人、善于交际的照顾者',
+                'ISTP':'鉴赏家 - 大胆而实际的实验家',
+                'ISFP':'探险家 - 灵活有魅力的艺术家',
+                'ESTP':'企业家 - 精明、精力充沛的感知者',
+                'ESFP':'表演者 - 自发的、精力充沛的娱乐者'
+            };
+            
+            let resultHTML = `
+                <div class="type-card">
+                    <div class="type-code">${type}</div>
+                    <div class="type-name">${typeDescriptions[type]}</div>
+                </div>
+
+                <div class="dimension-card">
+                    <h3>性格维度分析</h3>
+                    <div class="dimension-item">
+                        <div class="dimension-label">
+                            <span>外向(E) vs 内向(I)</span>
+                            <strong>${scores.E > scores.I ? 'E' : 'I'} 倾向</strong>
+                        </div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width:${Math.max(scores.E,scores.I)/(scores.E+scores.I)*100}%"></div>
+                        </div>
+                    </div>
+                    <div class="dimension-item">
+                        <div class="dimension-label">
+                            <span>感觉(S) vs 直觉(N)</span>
+                            <strong>${scores.S > scores.N ? 'S' : 'N'} 倾向</strong>
+                        </div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width:${Math.max(scores.S,scores.N)/(scores.S+scores.N)*100}%"></div>
+                        </div>
+                    </div>
+                    <div class="dimension-item">
+                        <div class="dimension-label">
+                            <span>思考(T) vs 情感(F)</span>
+                            <strong>${scores.T > scores.F ? 'T' : 'F'} 倾向</strong>
+                        </div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width:${Math.max(scores.T,scores.F)/(scores.T+scores.F)*100}%"></div>
+                        </div>
+                    </div>
+                    <div class="dimension-item">
+                        <div class="dimension-label">
+                            <span>判断(J) vs 知觉(P)</span>
+                            <strong>${scores.J > scores.P ? 'J' : 'P'} 倾向</strong>
+                        </div>
+                        <div class="progress-bar-small">
+                            <div class="progress-fill-small" style="width:${Math.max(scores.J,scores.P)/(scores.J+scores.P)*100}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('resultContent').innerHTML = resultHTML;
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            answers = new Array(93).fill(null);
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('introSection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
